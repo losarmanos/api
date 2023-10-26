@@ -95,9 +95,9 @@ const server = http.createServer((req, res) => {
     })
     proxyRes.on('end', () => {
       const calendar = processCalendar(icalData)
-      allowedOrigins.forEach(origin => {
-        res.setHeader('Access-Control-Allow-Origin', origin) // Establece el origen permitido
-      })
+      if (allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin); // Establece el origen permitido
+      }
       res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
       res.setHeader('Content-Type', 'application/json')
@@ -113,9 +113,9 @@ const server = http.createServer((req, res) => {
   })
 
   if (req.method === 'OPTIONS') {
-    allowedOrigins.forEach(origin => {
-      res.setHeader('Access-Control-Allow-Origin', origin) // Establece el origen permitido
-    })
+    if (allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin); // Establece el origen permitido
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
     res.writeHead(200)
