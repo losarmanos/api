@@ -2,6 +2,8 @@ const http = require('http')
 const https = require('https')
 const { readFileSync } = require('fs')
 
+// Lee el archivo .env para cargar las variables de entorno
+// no se usa otra estrategia porque esta funciona para el CI/CD
 const env = readFileSync('./.env', 'utf8')
   .split('\n')
   .map(line => line.split(' '))
@@ -11,12 +13,13 @@ const env = readFileSync('./.env', 'utf8')
 
 const { PORT = 8080 } = process.env
 
-console.log(process.env.ORIGINS)
-
+// limpieza de strings
 const processText = text => {
   return text.replace(/\\/g, '')
 }
 
+// Recibe un timestamp en formato internacional o en formato de 8 digitos y
+// regresa un epoch
 const processTimeStamp = timestamp => {
   const year = parseInt(timestamp.slice(0, 4))
   const month = parseInt(timestamp.slice(4, 6)) - 1
@@ -30,6 +33,9 @@ const processTimeStamp = timestamp => {
   return new Date(Date.UTC(year, month, day, hour, minute, second)).getTime()
 }
 
+// Procesamiento de iCal, obtiene el string completo y regresa un arreglo
+// ordenado y filtrado de objetos de calendario con textos
+// y elementos normalizados
 const processCalendar = (icalData) => {
   const [def, ...items] = icalData.split('BEGIN:VEVENT')
   return items
@@ -71,29 +77,42 @@ const processCalendar = (icalData) => {
     })
 }
 
+// Obtiene la URL del vcal haciendo match de un string con lo cargado
+// en las variables de entorno (puede regresar null)
 const getCalUrl = url => {
   const match = url.replace('/', '').toUpperCase()
   return process.env[match]
 }
 
+// servidor web para procesar las llamadas
 const server = http.createServer((req, res) => {
+
+  // validamos que el usuario esté buscando una ciudad definida
+  // y que solo sean los métodos aceptados
   const targetUrl = getCalUrl(req.url)
-  if (!targetUrl) {
+  if (!targetUrl || !['GET', 'OPTIONS'].includes(req.method)) {
     res.writeHead(404, { 'Content-Type': 'text/plain' })
-    res.end('Kha?')
+    res.end('Esta no es la página que estás buscando')
     return
   }
   const allowedOrigins = process.env.ORIGINS.split(',')
-  console.log(allowedOrigins)
   const { headers } = req
   const origin = headers['origin']
 
+  // CORS para unicamente orígenes válidos
   if (!allowedOrigins.includes(origin)) {
     res.writeHead(403, { 'Content-Type': 'text/plain' })
     res.end('Acceso no autorizado')
     return
   }
 
+  // Si ya llegó hasta acá no hay problema con CORS ni respuestas
+  res.setHeader('Access-Control-Allow-Origin', origin)
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Content-Type', 'application/json')
+
+  // Proxy para obtener la información del calendario requerido
   const proxyReq = https.request(targetUrl, (proxyRes) => {
     if (proxyRes.statusCode !== 200) {
       res.writeHead(proxyRes.statusCode)
@@ -106,29 +125,18 @@ const server = http.createServer((req, res) => {
     })
     proxyRes.on('end', () => {
       const calendar = processCalendar(icalData)
-      if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin); // Establece el origen permitido
-      }
-      res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-      res.setHeader('Content-Type', 'application/json')
       res.writeHead(200)
       res.end(JSON.stringify(calendar))
     })
   })
 
+  // Route handlers para todo lo demás
   proxyReq.on('error', (err) => {
     console.error('Error en la solicitud proxy:', err)
     res.writeHead(500)
     res.end('Error en la solicitud proxy')
   })
-
   if (req.method === 'OPTIONS') {
-    if (allowedOrigins.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin); // Establece el origen permitido
-    }
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
     res.writeHead(200)
     res.end()
   } else if (req.method === 'GET') {
@@ -136,6 +144,7 @@ const server = http.createServer((req, res) => {
   }
 })
 
+// Iniciamos el server
 server.listen(PORT, () => {
   console.log(`Proxy escuchando en el puerto ${PORT}`)
 })
