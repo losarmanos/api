@@ -30,6 +30,8 @@ jobs:
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.SSHKEY }}
         script: |
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
           cd ~/calendarProxy
           echo "${{ secrets.ENVFILE }}" > .envrc
           pm2 restart calendarProxy.js
