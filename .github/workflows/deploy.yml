@@ -34,4 +34,4 @@ jobs:
           source ~/.nvm/nvm.sh
           cd ~/calendarProxy
           echo "${{ secrets.ENVFILE }}" > .env
-          pm2 restart calendarProxy.js
+          pm2 restart CalendarProxy
