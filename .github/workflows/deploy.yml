@@ -32,3 +32,4 @@ jobs:
         script: |
           cd ~/calendarProxy
           echo "${{ secrets.ENVFILE }}" > .envrc
+          pm2 restart calendarProxy.js

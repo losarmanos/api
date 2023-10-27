@@ -1,1 +1,3 @@
-.envrc
+.env
+localhost.env
+production.env

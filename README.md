@@ -15,6 +15,7 @@ Solo funciona y fue probado con google calendar
 ## Variables de entorno
 
 `PORT` || el puerto donde va a levantar  
+`ORIGINS` || los origenes de donde vas a aceptar llamadas (CORS) separados por coma  
 `<CIUDAD>` || la URL del VCAL privado de google calendar, este nombre de ciudad se usará para la ruta
 
 Se pueden definir tantas ciudades como calendarios querramos regresar en JSON

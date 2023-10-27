@@ -1,7 +1,17 @@
 const http = require('http')
 const https = require('https')
+const { readFileSync } = require('fs')
+
+const env = readFileSync('./.env', 'utf8')
+  .split('\n')
+  .map(line => line.split(' '))
+  .map(([variable, value]) => {
+    process.env[variable] = value
+  })
 
 const { PORT = 8080 } = process.env
+
+console.log(process.env.ORIGINS)
 
 const processText = text => {
   return text.replace(/\\/g, '')
@@ -40,7 +50,7 @@ const processCalendar = (icalData) => {
       }
       const evt = {}
       evt.start = processText(event.dtstart || event['dtstart;value=date'])
-      evt.end = processText(event.dtend || event['dtstart;value=date'])
+      evt.end = processText(event.dtend || event['dtend;value=date'])
       if (event.location) evt.location = processText(event.location)
       evt.name = processText(event.summary)
       if (event.description) evt.description = processText(event.description)
@@ -73,7 +83,8 @@ const server = http.createServer((req, res) => {
     res.end('Kha?')
     return
   }
-  const allowedOrigins = ['https://losarmanos.com', 'http://localhost:8080']
+  const allowedOrigins = process.env.ORIGINS.split(',')
+  console.log(allowedOrigins)
   const { headers } = req
   const origin = headers['origin']
 
