@@ -3,7 +3,7 @@ const FishBrain = {
   store (key, value) {
     this.memory[key] = {
       value,
-      TTL: new Date().getTime() + 1000 * 10 * 10 // mili * secs * mins
+      TTL: new Date().getTime() + 1000 * 60 * 10 // mili * secs * mins
     }
   },
   read (key) {
