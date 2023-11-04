@@ -7,8 +7,7 @@ const proxy = (targetUrl, res) => {
   const { value } = FishBrain.read(targetUrl)
   if (value) {
     console.log('<- Cache response')
-    res.writeHead(200)
-    res.end(JSON.stringify(value))
+    res.json(value)
     return {
       end: () => { },
       on: () => { }
@@ -29,8 +28,7 @@ const proxy = (targetUrl, res) => {
     proxyRes.on('end', () => {
       const calendar = processCalendar(icalData)
       FishBrain.store(targetUrl, calendar)
-      res.writeHead(200)
-      res.end(JSON.stringify(calendar))
+      res.json(calendar)
     })
   })
 }

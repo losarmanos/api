@@ -1,15 +1,7 @@
+require('./dotenv')
 const express = require('express')
-const { readFileSync } = require('fs')
 const { proxy } = require('./proxy')
-
-// Lee el archivo .env para cargar las variables de entorno
-// no se usa otra estrategia porque esta funciona para el CI/CD
-readFileSync('./.env', 'utf8')
-  .split('\n')
-  .map(line => line.split(' '))
-  .forEach(([variable, value]) => {
-    process.env[variable] = value
-  })
+const { getMembers } = require('./mamalonadb')
 
 const { PORT = 8080 } = process.env
 
@@ -26,6 +18,11 @@ const gateway = (req, res, next) => {
     res.status(404).send('Esta no es la página que estás buscando')
     return
   }
+  req.targetUrl = targetUrl
+  next()
+}
+
+const cors = (req, res, next) => {
   const allowedOrigins = process.env.ORIGINS.split(',')
   const origin = req.get('origin')
   // CORS para unicamente orígenes válidos
@@ -38,11 +35,11 @@ const gateway = (req, res, next) => {
   res.set('Access-Control-Allow-Methods', 'GET, OPTIONS')
   res.set('Access-Control-Allow-Headers', 'Content-Type')
   res.set('Content-Type', 'application/json')
-  req.targetUrl = targetUrl
   next()
 }
-app.options('/:city', gateway, (_req, res) => { res.sendStatus(200) })
-app.get('/:city', gateway, (req, res) => {
+
+app.options('/calendar/:city', [cors, gateway], (_req, res) => { res.sendStatus(200) })
+app.get('/calendar/:city', [cors, gateway], (req, res) => {
   console.log(`-> Querying calendar for ${req.params.city}`)
 
   const proxyReq = proxy(req.targetUrl, res)
@@ -55,6 +52,8 @@ app.get('/:city', gateway, (req, res) => {
   })
   proxyReq.end()
 })
+
+app.get('/members/:uid', cors, getMembers)
 
 app.listen(PORT, () => {
   console.log(`Proxy escuchando en el puerto ${PORT}`)
