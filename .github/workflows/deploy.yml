@@ -34,6 +34,6 @@ jobs:
           source ~/.nvm/nvm.sh
           cd ~/ArmanosApi
           echo "${{ secrets.ENVFILE }}" > .env
-          echo "BUILD ${{ vars.GITHUB_RUN_NUMBER }} >> .env"
-          npm i --production
+          echo "\nBUILD ${{ vars.GITHUB_RUN_NUMBER }}" >> .env
+          npm i --omit=dev
           pm2 restart ArmanosApi
