@@ -1,12 +1,13 @@
 require('./dotenv')
 const express = require('express')
 const { proxy } = require('./proxy')
-const { getMembers } = require('./mamalonadb')
+const { getMember } = require('./mamalonadb')
 
 const { PORT = 8080 } = process.env
 
 // servidor web para procesar las llamadas
 const app = express()
+app.use(express.json())
 
 const gateway = (req, res, next) => {
   const urlMatch = req.params.city.toUpperCase()
@@ -53,7 +54,28 @@ app.get('/calendar/:city', [cors, gateway], (req, res) => {
   proxyReq.end()
 })
 
-app.get('/members/:uid', cors, getMembers)
+app.get('/members/:uid', cors, async (req, res) => {
+  const member = await getMember(req.params.uid)
+  delete member.address
+  delete member.phone
+  delete member.emergencyContact
+  delete member.emergencyPhone
+  res.json(member)
+})
+
+app.options('/members/:city', cors, (_req, res) => { res.sendStatus(200) })
+app.post('/members/:uid', cors, async (req, res) => {
+  const member = await getMember(req.params.uid)
+  console.log(member, req.body)
+  res.sendStatus(200)
+})
+
+app.get('/', (req, res) => {
+  res.json({
+    now: new Date(),
+    build: process.env.BUILD
+  })
+})
 
 app.listen(PORT, () => {
   console.log(`Proxy escuchando en el puerto ${PORT}`)

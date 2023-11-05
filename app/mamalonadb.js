@@ -30,7 +30,7 @@ const saveRows = async ([row, ...tail], sheet) => {
   }
   return saveRows(tail, sheet)
 }
-console.log(process.env.GOOGLE_PRIVATE_KEY)
+
 const loadRows = async () => {
   const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET, serviceAccountAuth)
   const cleanRows = []
@@ -45,10 +45,13 @@ const loadRows = async () => {
     cleanRows.push({
       name: row.get('Nombre completo'),
       dob: row.get('Fecha de nacimiento'),
-      emergencyName: row.get('Contacto de emergencia'),
+      address: row.get('Dirección'),
+      phone: row.get('Teléfono'),
+      emergencyContact: row.get('Contacto de emergencia'),
       emergencyPhone: row.get('Teléfono del contacto de emergencia'),
       medicConditions: row.get('Enfermedades crónicas y alergias'),
       bloodType: row.get('Tipo de sangre'),
+      vehicle: row.get('Marca y modelo de tu moto'),
       insurance: row.get('Seguro de tu moto (Compañía y número de póliza)'),
       active: row.get('Activo'),
       picture: row.get('Foto'),
@@ -63,19 +66,18 @@ const loadRows = async () => {
     })
 }
 
-const getMembers = async (req, res) => {
+const getMember = async (uid) => {
   const { value } = FishBrain.read('members')
   if (value) {
     console.log('<- Cache response')
-    res.json(value.find(member => member.UID === req.params.uid))
-    return
+    return JSON.parse(JSON.stringify(value.find(member => member.UID === uid)))
   }
   console.log('<- Remote response')
   const members = await loadRows()
   FishBrain.store('members', members)
-  res.json(members.find(member => member.UID === req.params.uid))
+  return JSON.parse(JSON.stringify(members.find(member => member.UID === uid)))
 }
 
 module.exports = {
-  getMembers
+  getMember
 }

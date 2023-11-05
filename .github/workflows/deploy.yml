@@ -20,7 +20,7 @@ jobs:
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.SSHKEY }}
         source: "."
-        target: "~/calendarProxy"
+        target: "~/ArmanosApi"
 
     - name: Executing remote command
       uses: appleboy/ssh-action@master
@@ -32,7 +32,8 @@ jobs:
         script: |
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
-          cd ~/calendarProxy
+          cd ~/ArmanosApi
           echo "${{ secrets.ENVFILE }}" > .env
+          echo "BUILD ${{ vars.GITHUB_RUN_NUMBER }} >> .env"
           npm i --production
-          pm2 restart CalendarProxy
+          pm2 restart ArmanosApi

@@ -1,7 +1,9 @@
-Calendar Proxi
+API
 ==============
 
-Este proxi de calendario obtiene el VCAL privado de google y regresa un JSON
+Este API trae cosas como el proxy calendar y ahora trae el directorio de miembros.
+
+El proxi de calendario obtiene el VCAL privado de google y regresa un JSON
 Tiene todos los CORS abiertos, pero solo acepta llamadas desde los sitios
 configurados perviamente.
 
@@ -49,3 +51,5 @@ Donde la url es donde esté montado tu proxi y ciudad es la definida en la varia
 Los demás son texto plano
 
 La respuesta trae los eventos ordenados desde el más actual hasta el futuro. No viene paginado y no trae resultados de eventos pasados.
+
+Directorio de miembros es un WIP
