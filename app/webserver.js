@@ -2,6 +2,7 @@ require('./dotenv')
 const express = require('express')
 const { proxy } = require('./proxy')
 const { getMember } = require('./mamalonadb')
+const { sendAlert } = require('./bot.js')
 
 const { PORT = 8080 } = process.env
 
@@ -66,11 +67,26 @@ app.get('/members/:uid', cors, async (req, res) => {
 app.options('/members/:city', cors, (_req, res) => { res.sendStatus(200) })
 app.post('/members/:uid', cors, async (req, res) => {
   const member = await getMember(req.params.uid)
-  console.log(member, req.body)
+  const { message, location } = req.body
+  const text = `
+*A T E N C I O N*
+Hay un reporte para _${member.name}_
+
+Contactar a _${member.emergencyContact}_ al ${member.emergencyPhone}
+
+Mensaje:
+\`\`\`
+${message.message}
+\`\`\`
+Para más información llamar _${message.author}_ al ${message.phone}
+
+[Localización del evento](https://maps.google.com/?q=${location.latitude},${location.longitude}) \\(aproximado a ${location.accuracy}m\\)
+  `
+  sendAlert(text)
   res.sendStatus(200)
 })
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({
     now: new Date(),
     build: process.env.BUILD
