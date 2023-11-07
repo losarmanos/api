@@ -68,7 +68,7 @@ app.options('/members/:city', cors, (_req, res) => { res.sendStatus(200) })
 app.post('/members/:uid', cors, async (req, res) => {
   const member = await getMember(req.params.uid)
   const { message, location } = req.body
-  const text = `
+  let text = `
 *A T E N C I O N*
 Hay un reporte para _${member.name}_
 
@@ -78,10 +78,13 @@ Mensaje:
 \`\`\`
 ${message.message}
 \`\`\`
-Para más información llamar _${message.author}_ al ${message.phone}
-
-[Localización del evento](https://maps.google.com/?q=${location.latitude},${location.longitude}) \\(aproximado a ${location.accuracy}m\\)
+Reporte levantado desde la página de alertas por: _${message.author}_. Para más información contactarle al: ${message.phone}
   `
+  if (location.latitude) {
+    text += `
+[Localización del evento](https://maps.google.com/?q=${location.latitude},${location.longitude}) \\(aproximado a ${location.accuracy}m\\)
+    `
+  }
   sendAlert(text)
   res.sendStatus(200)
 })
