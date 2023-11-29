@@ -1,6 +1,6 @@
 {
   "name": "calendarproxy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Calendar Proxi ==============",
   "main": "app/webserver.js",
   "scripts": {
