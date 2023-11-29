@@ -78,7 +78,8 @@ Mensaje:
 \`\`\`
 ${message.message}
 \`\`\`
-Reporte levantado desde la página de alertas por: _${message.author}_. Para más información contactarle al: ${message.phone}
+Reporte levantado desde la página de alertas por: _${message.author}_
+Para más información contactarle al: ${message.phone}
   `
   if (location.latitude) {
     text += `
