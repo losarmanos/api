@@ -25,12 +25,14 @@ const gateway = (req, res, next) => {
 }
 
 const cors = (req, res, next) => {
-  const allowedOrigins = process.env.ORIGINS.split(',')
   const origin = req.get('origin')
-  // CORS para unicamente orígenes válidos
-  if (!allowedOrigins.includes(origin)) {
-    res.status(403).send('Acceso no autorizado')
-    return
+  if (process.env.ENVIRONMENT !== 'localhost') {
+    const allowedOrigins = process.env.ORIGINS.split(',')
+    // CORS para unicamente orígenes válidos
+    if (!allowedOrigins.includes(origin)) {
+      res.status(403).send('Acceso no autorizado')
+      return
+    }
   }
   // Si ya llegó hasta acá no hay problema con CORS ni respuestas
   res.set('Access-Control-Allow-Origin', origin)

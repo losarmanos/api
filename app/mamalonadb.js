@@ -35,7 +35,7 @@ const loadRows = async () => {
   const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET, serviceAccountAuth)
   const cleanRows = []
   await doc.loadInfo()
-  const sheet = doc.sheetsByIndex[7] // resultados del formulario
+  const sheet = doc.sheetsByIndex[0] // resultados del formulario
   let rows = await sheet.getRows()
   const uids = []
   rows.forEach(row => uids.push(row.get('UID')))
