@@ -3,7 +3,14 @@ let client
 
 if (process.env.ENVIRONMENT !== 'localhost') {
   wppconnect
-    .create({ session: 'armanosBot' })
+    .create({
+      session: 'armanosBot',
+      autoClose: false,
+      headless: 'new',
+      puppeteerOptions: {
+        args: ['--no-sandbox']
+      }
+    })
     .then((c) => start(c))
     .catch((error) => console.log(error))
 }
