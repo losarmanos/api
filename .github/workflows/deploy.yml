@@ -30,8 +30,8 @@ jobs:
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.SSHKEY }}
         script: |
-          export NVM_DIR=~/.nvm
-          source ~/.nvm/nvm.sh
+          . "$HOME/.asdf/asdf.sh"
+          . "$HOME/.asdf/completions/asdf.bash"
           cd ~/ArmanosApi
           echo "${{ secrets.ENVFILE }}" > .env
           echo "BUILD ${{ github.run_id }}-${{ github.run_number }}" >> .env
