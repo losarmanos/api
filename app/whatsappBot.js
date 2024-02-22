@@ -17,16 +17,14 @@ if (process.env.ENVIRONMENT !== 'localhost') {
 
 const start = c => {
   client = c
-  // client.onMessage(message => {
-  //   console.log(message)
-  //   console.log(message.from === process.env.WHATSAPP_CHANNEL, message.from, process.env.WHATSAPP_CHANNEL)
-  //   console.log(message.content === 'ping', message.content)
-  //   if (message.from !== process.env.WHATSAPP_CHANNEL) return
-  //   if (message.content !== 'ping') return
-  //   client.sendText(process.env.WHATSAPP_CHANNEL, 'pong')
-  //     .then(console.log)
-  //     .catch(console.error)
-  // })
+  client.onMessage(message => {
+    console.log(message.content === 'ping', message.content)
+    if (message.content !== 'ping') return
+    console.log(message)
+    client.sendText(message.from, 'pong')
+      .then(_ => {})
+      .catch(console.error)
+  })
 }
 
 const sendAlert = msg => {
