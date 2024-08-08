@@ -76,10 +76,11 @@ const start = c => {
       const assistant = await main()
       const { status, data } = await assistant(text)
       if (!status === 'success') return
-      const { people, vehicles: _v, destination, eta } = data
+      const { people: _p, vehicles: _v, destination, eta } = data
       const vehicles = Math.max(1, ~~_v)
+      const people = Math.max(1, ~~_p)
       const motos = `${vehicles} ${pluralize(vehicles, 'moto')}`
-      const ppls = `${people} ${pluralize(~~people, 'persona')}`
+      const ppls = `${people} ${pluralize(people, 'persona')}`
       const calculatedETA = new Date(Date.now() + eta * 1000)
       const aprox = calculatedETA.toLocaleTimeString()
       FishBrain.store(
