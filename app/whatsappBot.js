@@ -22,8 +22,10 @@ const pluralize = (n, string) => n > 1 ? `${string}s` : string
 const localeTime = (date) => {
   const newDate = new Date(date)
   // To do: change to user's timezone somehow
-  newDate.setMinutes(newDate.getMinutes() - 360)
-  newDate.toLocaleTimeString()
+  newDate.toLocaleTimeString(
+    'es-MX',
+    { hour12: true, hour: 'numeric', minute: 'numeric', timeZone: 'America/Mexico_City' }
+  )
   return newDate
 }
 
