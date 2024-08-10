@@ -19,6 +19,13 @@ if (process.env.ENVIRONMENT !== 'localhost') {
 
 const pluralize = (n, string) => n > 1 ? `${string}s` : string
 
+const localeTime = (date) => {
+  const newDate = new Date(date)
+  // To do: change to user's timezone somehow
+  newDate.toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City' })
+  return newDate
+}
+
 const status = async (message, report = true) => {
   const roadies = FishBrain.getRoadies()
   const chat = await client.getChatById(message.chatId)
@@ -27,7 +34,7 @@ const status = async (message, report = true) => {
     .filter(([key, { value }]) => value.channel === message.from)
     .forEach(([key, { value }]) => {
       const { id, destination, people, vehicles, calculatedETA } = value
-      const aprox = calculatedETA.toLocaleTimeString()
+      const aprox = localeTime(calculatedETA)
       const ppls = `${people} ${pluralize(people, 'persona')}`
       const motos = `${vehicles} ${pluralize(vehicles, 'moto')}`
       const msg = `🏍️ @${id} (${ppls}, ${motos}) en ruta a ${destination}. ETA: ${aprox}`
@@ -53,7 +60,7 @@ const start = c => {
     Object.entries(channels).forEach(([channel, roadies]) => {
       const msgs = ['🚨REPORTAR STATUS🚨']
       roadies.forEach(({ id, destination, people, vehicles, calculatedETA }) => {
-        const aprox = calculatedETA.toLocaleTimeString()
+        const aprox = localeTime(calculatedETA)
         const ppls = `${people} ${pluralize(people, 'persona')}`
         const motos = `${vehicles} ${pluralize(vehicles, 'moto')}`
         const msg = `🏍️ @${id} (${ppls}, ${motos}) en ruta a ${destination}. ETA: ${aprox}`
@@ -82,7 +89,7 @@ const start = c => {
       const motos = `${vehicles} ${pluralize(vehicles, 'moto')}`
       const ppls = `${people} ${pluralize(people, 'persona')}`
       const calculatedETA = new Date(Date.now() + eta * 1000)
-      const aprox = calculatedETA.toLocaleTimeString()
+      const aprox = localeTime(calculatedETA)
       FishBrain.store(
         `roadie-${number}`,
         {
