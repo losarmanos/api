@@ -70,8 +70,8 @@ const start = c => {
     if (!message.content) return
     const text = message.content.toLowerCase()
     const [number] = message.sender.id.split('@')
-
-    if (text.includes('reporto salida')) {
+    const cleanedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    if (cleanedText.includes('reporto salida')) {
       const chat = await client.getChatById(message.chatId)
       const assistant = await main()
       const { status, data } = await assistant(text)
@@ -100,14 +100,14 @@ const start = c => {
       return client.sendText(message.from, response).then(_ => {}).catch(console.error)
     }
 
-    if (text.includes('reporto llegada')) {
+    if (cleanedText.includes('reporto llegada')) {
       response = `📍 @${number} llegó a destino`
       FishBrain.delete(`roadie-${number}`)
       status(message, false)
       return client.sendText(message.from, response).then(_ => {}).catch(console.error)
     }
 
-    if (text.includes('como va la rodada') || text.includes('cómo va la rodada')) {
+    if (cleanedText.includes('como va la rodada')) {
       return status(message)
     }
 
