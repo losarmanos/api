@@ -103,7 +103,7 @@ const start = c => {
         },
         eta * 1000
       )
-      client.setGroupSubject(message.chatId, `🚨${chat.name}🚨`)
+      if (!chat.name.includes('🚨')) client.setGroupSubject(message.chatId, `🚨${chat.name}🚨`)
       response = `🏍️ @${number} (${ppls}, ${motos}) en ruta a ${destination}. ETA: ${aprox}`
       return client.sendText(message.from, response).then(_ => {}).catch(console.error)
     }
