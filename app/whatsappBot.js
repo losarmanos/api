@@ -6,7 +6,7 @@ let client
 if (process.env.ENVIRONMENT !== 'localhost') {
   wppconnect
     .create({
-      session: 'armanosBot',
+      session: process.env.ENVIRONMENT,
       autoClose: false,
       headless: 'new',
       puppeteerOptions: {
@@ -74,6 +74,10 @@ const start = c => {
     })
   })
   client.onMessage(async message => {
+    if (
+      process.env.ENVIRONMENT === 'production' &&
+      message.chatId === process.env.WHATSAPP_DEV_CHANNEL
+    ) return
     let response
     if (!message.content) return
     const text = message.content.toLowerCase()
