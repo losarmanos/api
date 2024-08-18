@@ -30,6 +30,7 @@ const localeTime = (date) => {
 const status = async (message, report = true) => {
   const roadies = FishBrain.getRoadies()
   const chat = await client.getChatById(message.chatId)
+  const chatName = chat.name || chat.contact.name
   const msgs = ['🚨PILOTOS ACTIVOS🚨']
   roadies
     .filter(([key, { value }]) => value.channel === message.from)
@@ -43,7 +44,7 @@ const status = async (message, report = true) => {
     })
   if (msgs.length === 1) {
     client.sendText(message.from, 'no hay pilotos activos').then(_ => { }).catch(console.error)
-    if (chat.name.includes('🚨')) client.setGroupSubject(message.chatId, chat.name.replace(/🚨/g, ''))
+    if (chatName.includes('🚨')) client.setGroupSubject(message.chatId, chatName.replace(/🚨/g, ''))
     return
   }
   if (report) client.sendText(message.from, msgs.join('\n')).then(_ => {}).catch(console.error)
@@ -78,6 +79,9 @@ const start = c => {
       process.env.ENVIRONMENT === 'production' &&
       message.chatId === process.env.WHATSAPP_DEV_CHANNEL
     ) return
+    if (process.env.ENVIRONMENT === 'development' &&
+      message.chatId !== process.env.WHATSAPP_DEV_CHANNEL
+    ) return
     let response
     if (!message.content) return
     const text = message.content.toLowerCase()
@@ -85,6 +89,7 @@ const start = c => {
     const cleanedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     if (cleanedText.includes('reporto salida')) {
       const chat = await client.getChatById(message.chatId)
+      const chatName = chat.name || chat.contact.name
       const assistant = await main()
       const { status, data } = await assistant(text)
       if (!status === 'success') return
@@ -107,7 +112,7 @@ const start = c => {
         },
         eta * 1000
       )
-      if (!chat.name.includes('🚨')) client.setGroupSubject(message.chatId, `🚨${chat.name}🚨`)
+      if (!chatName.includes('🚨')) client.setGroupSubject(message.chatId, `🚨${chatName}🚨`)
       response = `🏍️ @${number} (${ppls}, ${motos}) en ruta a ${destination}. ETA: ${aprox}`
       return client.sendText(message.from, response).then(_ => {}).catch(console.error)
     }
