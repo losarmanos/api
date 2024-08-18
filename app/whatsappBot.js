@@ -6,7 +6,7 @@ let client
 if (process.env.ENVIRONMENT !== 'localhost') {
   wppconnect
     .create({
-      session: process.env.ENVIRONMENT,
+      session: process.env.WHATSAPP_SESSION,
       autoClose: false,
       headless: 'new',
       puppeteerOptions: {
