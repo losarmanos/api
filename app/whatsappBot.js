@@ -84,10 +84,14 @@ const start = c => {
     ) return
     let response
     if (!message.content) return
+    let [number] = message.sender.id.split('@')
     const text = message.content.toLowerCase()
-    const [number] = message.sender.id.split('@')
     const cleanedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     if (cleanedText.includes('reporto salida')) {
+      if (cleanedText.includes('reporto salida a nombre de')) {
+        const [_, name] = cleanedText.split('nombre de')
+        number = name.trim().remove('@')
+      }
       const chat = await client.getChatById(message.chatId)
       const chatName = chat.name || chat.contact.name
       const assistant = await main()
@@ -118,6 +122,10 @@ const start = c => {
     }
 
     if (cleanedText.includes('reporto llegada')) {
+      if (cleanedText.includes('reporto llegada a nombre de')) {
+        const [_, name] = cleanedText.split('nombre de')
+        number = name.trim().remove('@')
+      }
       response = `📍 @${number} llegó a destino`
       FishBrain.delete(`roadie-${number}`)
       status(message, false)
